@@ -482,7 +482,7 @@ function loadVoices() {
   document.getElementById('voice-status').textContent = `🔊 Voce: ${selectedVoice.name} (browser)`;
 }
 
-window.speechSynthesis.onvoiceschanged = loadVoices;
+window.speechSynthesis.onvoiceschanged = () => { if (!elApiKey) loadVoices(); };
 
 /* ══════════════════════════════════════
    API KEY
@@ -493,7 +493,11 @@ function saveKey() {
   apiKey = k;
   localStorage.setItem('oss_api_key', k);
   const elKey = document.getElementById('el-key-input').value.trim();
-  if (elKey) { elApiKey = elKey; localStorage.setItem('oss_el_key', elKey); }
+  if (elKey) { 
+    elApiKey = elKey; 
+    localStorage.setItem('oss_el_key', elKey);
+    document.getElementById('voice-status').textContent = '🔊 Voce: Serena (ElevenLabs)';
+  }
   document.getElementById('api-error').style.display = 'none';
   document.getElementById('api-screen').style.display = 'none';
   document.getElementById('main-app').style.display = 'block';
