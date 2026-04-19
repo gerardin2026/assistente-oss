@@ -550,34 +550,49 @@ function initSpeech() {
   recognition.continuous = false;
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
-  recognition.onresult = (e) => {
-    const text = e.results[0][0].transcript;
-    document.getElementById('user-input').value = text;
-    stopListening();
-    setTimeout(() => handleSend(), 300);
+
+  recognition.onstart = () => {
+    isListening = true;
+    document.getElementById('mic-btn').classList.add('listening');
+    document.getElementById('mic-status').style.display = 'block';
   };
-  recognition.onspeechend = () => { try { recognition.stop(); } catch(e) {} };
-  recognition.onerror = (e) => { console.error('Speech error:', e.error); stopListening(); };
-  recognition.onend = () => stopListening();
+
+  recognition.onresult = (e) => {
+    if (e.results && e.results.length > 0) {
+      const text = e.results[0][0].transcript;
+      document.getElementById('user-input').value = text;
+    }
+  };
+
+  recognition.onend = () => {
+    const text = document.getElementById('user-input').value.trim();
+    stopListening();
+    if (text) setTimeout(() => handleSend(), 200);
+  };
+
+  recognition.onerror = (e) => {
+    console.error('Speech error:', e.error);
+    stopListening();
+    if (e.error === 'not-allowed') {
+      alert('Microfono bloccato. Vai nelle impostazioni del browser e consenti il microfono per questo sito.');
+    }
+  };
 }
+
 function toggleMic() {
-  if (!recognition) { alert('Riconoscimento vocale non supportato. Usa Chrome o Edge.'); return; }
-  if (isListening) { stopListening(); return; }
-  navigator.mediaDevices.getUserMedia({audio:true})
-    .then(() => startListening())
-    .catch(() => {
-      alert('⚠️ Microfono bloccato dal browser.\n\nPer abilitarlo apri Edge invece di Chrome: Edge permette il microfono anche da file locale.\n\nOppure scrivi la domanda a mano.');
-    });
-}
-function startListening() {
+  if (!recognition) { alert('Riconoscimento vocale non supportato su questo browser.'); return; }
+  if (isListening) { try { recognition.stop(); } catch(e) {} stopListening(); return; }
   window.speechSynthesis && window.speechSynthesis.cancel();
+  try { recognition.start(); } catch(e) {
+    console.error('Mic start error:', e);
+    stopListening();
+  }
+}
+
+function startListening() {
   isListening = true;
   document.getElementById('mic-btn').classList.add('listening');
   document.getElementById('mic-status').style.display = 'block';
-  try { recognition.start(); } catch(e) {
-    stopListening();
-    alert('Errore microfono. Riprova.');
-  }
 }
 function stopListening() {
   isListening = false;
