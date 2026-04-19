@@ -692,14 +692,26 @@ function speakBrowser(text) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   const utt = new SpeechSynthesisUtterance(text);
-  utt.lang = 'it-IT'; utt.rate = 0.95; utt.pitch = 1;
-  if (selectedVoice) utt.voice = selectedVoice;
+  utt.lang = 'it-IT'; utt.rate = 0.92; utt.pitch = 1;
+  const voices = window.speechSynthesis.getVoices();
+  const itVoice = voices.find(v => v.lang.startsWith('it'));
+  if (itVoice) utt.voice = itVoice;
+  else if (selectedVoice) utt.voice = selectedVoice;
   window.speechSynthesis.speak(utt);
 }
 
 function speak(text) {
   const clean = cleanTextForSpeech(text);
-  if (elApiKey) { speakElevenLabs(clean); } else { speakBrowser(clean); }
+  if (elApiKey) {
+    speakElevenLabs(clean).catch(() => speakBrowser(clean));
+  } else {
+    speakBrowser(clean);
+  }
+}
+
+function speakFromButton(text) {
+  const clean = cleanTextForSpeech(text);
+  speakBrowser(clean);
 }
 
 /* ══════════════════════════════════════
@@ -713,7 +725,7 @@ function addMsg(text, role, withReplay) {
   const d = document.createElement('div'); d.className=`msg ${role}`;
   const safe = text.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
   let html = `<div class="bubble">${text.replace(/\n/g,'<br>')}</div><div class="msg-time">${now()}</div>`;
-  if (withReplay) html += `<button class="replay-btn" onclick="speak('${safe}')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg> Riascolta</button>`;
+  if (withReplay) html += `<button class="replay-btn" onclick="speakFromButton('${safe}')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg> Riascolta</button>`;
   d.innerHTML = html; msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight;
 }
 function showTyping() {
