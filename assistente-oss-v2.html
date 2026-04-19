@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assistente OSS</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --g-dark: #0a5c44;
+  --g-mid: #1D9E75;
+  --g-light: #5DCAA5;
+  --g-pale: #E1F5EE;
+  --g-xpale: #f0faf6;
+  --bg: #f4f6f5;
+  --surface: #ffffff;
+  --border: #dde8e3;
+  --text: #1a2e22;
+  --muted: #6b7f74;
+  --hint: #a8bab3;
+  --warn-bg: #fff8ec;
+  --warn-text: #7a5500;
+  --warn-border: #fce3a0;
+  --red: #c0392b;
+  --red-pale: #ffeaea;
+  --blue-pale: #eaf3ff;
+  --blue: #2980b9;
+  --amber: #e67e22;
+  --amber-pale: #fff3e0;
+  --radius: 18px;
+  --radius-sm: 12px;
+  --radius-xs: 8px;
+  --shadow: 0 6px 40px rgba(10,92,68,0.10);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-start;
+  padding: 24px 16px 40px;
+}
+
+/* ── API SCREEN ── */
+#api-screen { width:100%; max-width:400px; margin-top:64px; animation:fadeUp .4s ease both; }
+.api-logo { text-align:center; margin-bottom:28px; }
+.api-logo .icon { width:68px; height:68px; border-radius:50%; background:var(--g-pale); display:flex; align-items:center; justify-content:center; font-size:30px; margin:0 auto 14px; }
+.api-logo h1 { font-size:22px; font-weight:600; color:var(--text); letter-spacing:-.3px; }
+.api-logo p  { font-size:14px; color:var(--muted); margin-top:6px; }
+.api-card { background:var(--surface); border-radius:var(--radius); border:1px solid var(--border); box-shadow:var(--shadow); padding:28px; }
+.api-card label { display:block; font-size:13px; font-weight:500; color:var(--text); margin-bottom:8px; }
+.api-card input[type="password"] { width:100%; border:1px solid var(--border); border-radius:var(--radius-sm); padding:11px 14px; font-family:'DM Mono',monospace; font-size:13px; color:var(--text); background:var(--bg); outline:none; transition:border .15s; }
+.api-card input:focus { border-color:var(--g-mid); }
+.api-card .hint { font-size:12px; color:var(--hint); margin-top:8px; }
+.api-card .hint a { color:var(--g-mid); text-decoration:none; }
+#api-error { margin-top:10px; font-size:12px; color:var(--red); display:none; }
+.btn-primary { width:100%; margin-top:18px; padding:13px; background:var(--g-mid); color:#fff; border:none; border-radius:var(--radius-sm); font-family:'DM Sans',sans-serif; font-size:15px; font-weight:500; cursor:pointer; transition:background .15s; }
+.btn-primary:hover { background:var(--g-dark); }
+
+/* ── FRASE DEL GIORNO MODAL ── */
+#frase-modal {
+  display:none; position:fixed; inset:0; z-index:1000;
+  background:rgba(0,0,0,0.45);
+  align-items:center; justify-content:center;
+}
+#frase-modal.show { display:flex; }
+.frase-box {
+  background:var(--surface); border-radius:var(--radius);
+  padding:32px 28px; max-width:360px; width:90%;
+  text-align:center; box-shadow:var(--shadow);
+  animation:fadeUp .3s ease both;
+}
+.frase-icon { font-size:32px; margin-bottom:16px; }
+.frase-text { font-size:16px; font-weight:500; color:var(--text); line-height:1.6; margin-bottom:8px; font-style:italic; }
+.frase-sub  { font-size:12px; color:var(--muted); margin-bottom:24px; }
+.frase-box button { padding:10px 28px; background:var(--g-mid); color:#fff; border:none; border-radius:var(--radius-sm); font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; cursor:pointer; }
+.frase-box button:hover { background:var(--g-dark); }
+
+/* ── MAIN APP ── */
+#main-app { display:none; width:100%; max-width:560px; animation:fadeUp .35s ease both; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+.app-shell { background:var(--surface); border-radius:var(--radius); border:1px solid var(--border); box-shadow:var(--shadow); display:flex; flex-direction:column; height:90vh; min-height:520px; max-height:780px; overflow:hidden; }
+
+/* header */
+.app-header { padding:13px 18px; border-bottom:1px solid var(--border); background:var(--g-xpale); display:flex; align-items:center; gap:12px; flex-shrink:0; }
+.hbadge { width:38px; height:38px; border-radius:50%; background:var(--g-pale); display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0; }
+.htitle { font-size:15px; font-weight:600; color:var(--text); }
+.hsub   { font-size:11px; color:var(--muted); }
+.btn-key { margin-left:auto; font-size:11px; color:var(--hint); background:none; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; padding:4px 8px; border-radius:6px; flex-shrink:0; }
+.btn-key:hover { background:var(--g-pale); color:var(--g-dark); }
+
+.disclaimer { padding:5px 16px; background:var(--warn-bg); font-size:11px; color:var(--warn-text); border-bottom:1px solid var(--warn-border); flex-shrink:0; }
+.voice-bar { padding:5px 14px; background:var(--g-xpale); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.voice-bar label { font-size:11px; color:var(--muted); white-space:nowrap; }
+.voice-bar select { flex:1; font-size:11px; border:1px solid var(--border); border-radius:6px; padding:3px 6px; color:var(--text); background:#fff; font-family:'DM Sans',sans-serif; outline:none; }
+
+/* nav tabs */
+.app-nav { display:flex; border-bottom:1px solid var(--border); background:var(--g-xpale); flex-shrink:0; overflow-x:auto; }
+.nav-tab { padding:9px 14px; font-size:12px; color:var(--muted); cursor:pointer; font-weight:500; border-bottom:2px solid transparent; user-select:none; white-space:nowrap; flex-shrink:0; }
+.nav-tab.active { color:var(--g-dark); border-bottom-color:var(--g-mid); }
+
+/* views */
+.view { display:none; flex:1; flex-direction:column; overflow:hidden; }
+.view.active { display:flex; }
+
+/* ── CHAT ── */
+.cat-chips { padding:8px 12px; display:flex; flex-wrap:wrap; gap:6px; border-bottom:1px solid var(--border); background:#fafcfb; flex-shrink:0; }
+.chip { padding:5px 11px; border:1px solid var(--border); border-radius:20px; font-size:12px; color:var(--muted); cursor:pointer; background:#fff; transition:all .13s; }
+.chip:hover  { background:var(--g-pale); border-color:var(--g-light); }
+.chip.active { background:var(--g-pale); color:var(--g-dark); border-color:var(--g-light); font-weight:500; }
+
+#mic-status { text-align:center; font-size:12px; color:var(--red); padding:4px 12px; display:none; flex-shrink:0; background:var(--red-pale); }
+
+#messages { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:10px; }
+.msg { display:flex; flex-direction:column; max-width:86%; }
+.msg.user { align-self:flex-end; align-items:flex-end; }
+.msg.bot  { align-self:flex-start; align-items:flex-start; }
+.bubble { padding:10px 14px; border-radius:18px; font-size:13px; line-height:1.65; }
+.msg.user .bubble { background:var(--g-mid); color:#fff; border-bottom-right-radius:4px; }
+.msg.bot  .bubble { background:var(--g-xpale); color:var(--text); border:1px solid var(--border); border-bottom-left-radius:4px; }
+.msg-time { font-size:11px; color:var(--hint); margin-top:3px; padding:0 4px; }
+.replay-btn { margin-top:4px; padding:3px 10px; background:none; border:1px solid var(--border); border-radius:20px; font-size:11px; color:var(--muted); cursor:pointer; font-family:'DM Sans',sans-serif; display:flex; align-items:center; gap:4px; transition:all .13s; }
+.replay-btn:hover { background:var(--g-pale); border-color:var(--g-light); color:var(--g-dark); }
+
+.typing-dots { display:flex; gap:4px; align-items:center; padding:12px 16px; }
+.dot { width:6px; height:6px; border-radius:50%; background:var(--hint); animation:blink 1.2s infinite; }
+.dot:nth-child(2){animation-delay:.2s} .dot:nth-child(3){animation-delay:.4s}
+@keyframes blink { 0%,80%,100%{opacity:.2}40%{opacity:1} }
+
+.input-area { padding:10px 12px; border-top:1px solid var(--border); display:flex; gap:8px; align-items:flex-end; background:#fafcfb; flex-shrink:0; }
+#user-input { flex:1; border:1px solid var(--border); border-radius:20px; padding:10px 14px; font-size:13px; font-family:'DM Sans',sans-serif; resize:none; min-height:40px; max-height:100px; color:var(--text); background:#fff; outline:none; transition:border .15s; }
+#user-input:focus { border-color:var(--g-mid); }
+#mic-btn { width:40px; height:40px; border-radius:50%; background:var(--surface); border:1px solid var(--border); cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+#mic-btn:hover { background:var(--g-pale); border-color:var(--g-light); }
+#mic-btn.listening { background:var(--red-pale); border-color:var(--red); animation:pulse 1s infinite; }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+#send-btn { width:40px; height:40px; border-radius:50%; background:var(--g-mid); border:none; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:background .15s; }
+#send-btn:hover    { background:var(--g-dark); }
+#send-btn:disabled { background:var(--border); cursor:not-allowed; }
+
+/* ── CHECKLIST ── */
+#view-checklist { overflow-y:auto; padding:14px; gap:12px; }
+.turno-selector { display:flex; gap:8px; margin-bottom:4px; flex-shrink:0; }
+.turno-btn { flex:1; padding:8px; border:1px solid var(--border); border-radius:var(--radius-xs); font-size:13px; font-weight:500; color:var(--muted); background:#fff; cursor:pointer; transition:all .13s; text-align:center; }
+.turno-btn.active { background:var(--g-pale); color:var(--g-dark); border-color:var(--g-light); }
+.checklist-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.checklist-header span { font-size:13px; color:var(--muted); }
+.btn-sm { padding:5px 12px; border:1px solid var(--border); border-radius:20px; font-size:12px; color:var(--muted); background:#fff; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .13s; }
+.btn-sm:hover { background:var(--g-pale); border-color:var(--g-light); color:var(--g-dark); }
+.btn-sm.red:hover { background:var(--red-pale); border-color:var(--red); color:var(--red); }
+.check-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--border); border-radius:var(--radius-xs); background:#fff; margin-bottom:6px; transition:all .13s; }
+.check-item.done { background:var(--g-xpale); }
+.check-item.done .check-label { text-decoration:line-through; color:var(--hint); }
+.check-box { width:20px; height:20px; border:2px solid var(--border); border-radius:5px; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all .13s; background:#fff; }
+.check-box.done { background:var(--g-mid); border-color:var(--g-mid); }
+.check-label { flex:1; font-size:13px; color:var(--text); }
+.check-del { background:none; border:none; color:var(--hint); cursor:pointer; font-size:16px; padding:0 2px; line-height:1; }
+.check-del:hover { color:var(--red); }
+.add-item-row { display:flex; gap:8px; margin-top:8px; }
+.add-item-row input { flex:1; border:1px solid var(--border); border-radius:var(--radius-xs); padding:9px 12px; font-size:13px; font-family:'DM Sans',sans-serif; color:var(--text); background:#fff; outline:none; }
+.add-item-row input:focus { border-color:var(--g-mid); }
+.add-item-row button { padding:9px 16px; background:var(--g-mid); color:#fff; border:none; border-radius:var(--radius-xs); font-size:13px; cursor:pointer; font-family:'DM Sans',sans-serif; }
+.add-item-row button:hover { background:var(--g-dark); }
+
+/* ── NOTE RAPIDE ── */
+#view-note { overflow-y:auto; padding:14px; gap:10px; }
+.note-input-area { flex-shrink:0; margin-bottom:4px; }
+.note-input-area textarea { width:100%; border:1px solid var(--border); border-radius:var(--radius-sm); padding:11px 14px; font-size:13px; font-family:'DM Sans',sans-serif; resize:none; height:80px; color:var(--text); background:#fff; outline:none; transition:border .15s; }
+.note-input-area textarea:focus { border-color:var(--g-mid); }
+.note-actions { display:flex; gap:8px; margin-top:8px; }
+.note-actions button { padding:8px 16px; border:none; border-radius:var(--radius-xs); font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; }
+.btn-save { background:var(--g-mid); color:#fff; flex:1; }
+.btn-save:hover { background:var(--g-dark); }
+.btn-mic-note { background:var(--surface); border:1px solid var(--border) !important; color:var(--muted); display:flex; align-items:center; gap:6px; border-radius:var(--radius-xs); padding:8px 14px; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:13px; }
+.btn-mic-note:hover { background:var(--g-pale); }
+.btn-mic-note.listening { background:var(--red-pale); color:var(--red); }
+.notes-list { flex:1; display:flex; flex-direction:column; gap:8px; }
+.note-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px; position:relative; }
+.note-card .note-text { font-size:13px; color:var(--text); line-height:1.6; margin-bottom:6px; white-space:pre-wrap; }
+.note-card .note-meta { font-size:11px; color:var(--hint); display:flex; justify-content:space-between; align-items:center; }
+.note-card .note-del { background:none; border:none; color:var(--hint); cursor:pointer; font-size:13px; padding:0; }
+.note-card .note-del:hover { color:var(--red); }
+.no-notes { text-align:center; padding:40px 20px; color:var(--hint); font-size:14px; }
+
+/* ── QUIZ ── */
+#view-quiz { overflow-y:auto; padding:14px; gap:12px; }
+.quiz-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius-sm); padding:18px; }
+.quiz-q { font-size:14px; font-weight:500; color:var(--text); margin-bottom:14px; line-height:1.5; }
+.quiz-options { display:flex; flex-direction:column; gap:8px; }
+.quiz-opt { padding:10px 14px; border:1px solid var(--border); border-radius:var(--radius-xs); font-size:13px; color:var(--text); cursor:pointer; background:#fff; text-align:left; font-family:'DM Sans',sans-serif; transition:all .13s; }
+.quiz-opt:hover:not(:disabled) { background:var(--g-xpale); border-color:var(--g-light); }
+.quiz-opt.correct  { background:#eafaf1; border-color:#27ae60; color:#1a5c36; }
+.quiz-opt.wrong    { background:var(--red-pale); border-color:var(--red); color:var(--red); }
+.quiz-opt:disabled { cursor:default; }
+.quiz-spieg { margin-top:12px; padding:10px 14px; background:var(--g-xpale); border-radius:var(--radius-xs); font-size:12px; color:var(--muted); line-height:1.6; display:none; }
+.quiz-nav { display:flex; justify-content:space-between; align-items:center; margin-top:14px; }
+.quiz-nav button { padding:8px 20px; background:var(--g-mid); color:#fff; border:none; border-radius:var(--radius-xs); font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; }
+.quiz-nav button:hover { background:var(--g-dark); }
+.quiz-counter { font-size:12px; color:var(--muted); }
+
+/* ── LO SAPEVI ── */
+#view-sapevi { overflow-y:auto; padding:14px; gap:10px; }
+.sapevi-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius-sm); overflow:hidden; }
+.sapevi-head { padding:13px 16px; background:var(--g-xpale); display:flex; justify-content:space-between; align-items:center; cursor:pointer; }
+.sapevi-head:hover { background:var(--g-pale); }
+.sapevi-title { font-size:13px; font-weight:500; color:var(--text); display:flex; align-items:center; gap:8px; }
+.sapevi-arr { font-size:10px; color:var(--hint); transition:transform .2s; }
+.sapevi-body { display:none; padding:14px 16px; font-size:13px; color:var(--muted); line-height:1.7; border-top:1px solid var(--border); }
+.sapevi-tag { display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:500; margin-bottom:8px; }
+.tag-green  { background:var(--g-pale); color:var(--g-dark); }
+.tag-blue   { background:var(--blue-pale); color:var(--blue); }
+.tag-amber  { background:var(--amber-pale); color:var(--amber); }
+
+@media (max-width:480px) {
+  body { padding:0; }
+  .app-shell { border-radius:0; border:none; height:100vh; max-height:100vh; box-shadow:none; }
+  #main-app { max-width:100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- API SCREEN -->
+<div id="api-screen">
+  <div class="api-logo">
+    <div class="icon">🩺</div>
+    <h1>Assistente OSS</h1>
+    <p>Inserisci la tua chiave API per iniziare</p>
+  </div>
+  <div class="api-card">
+    <label for="api-key-input">Chiave API Anthropic</label>
+    <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." autocomplete="off"/>
+    <p class="hint">Ottieni la tua chiave su <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a>. Viene salvata solo nel tuo browser.</p>
+    <p id="api-error">Chiave non valida. Controlla e riprova.</p>
+    <button class="btn-primary" onclick="saveKey()">Accedi →</button>
+    <p style="font-size:11px;color:var(--hint);margin-top:16px;text-align:center;">Chiave ElevenLabs (opzionale — per voce naturale)</p>
+    <input type="password" id="el-key-input" placeholder="sk_..." autocomplete="off" style="margin-top:6px;width:100%;border:1px solid var(--border);border-radius:var(--radius-sm);padding:11px 14px;font-family:'DM Mono',monospace;font-size:13px;color:var(--text);background:var(--bg);outline:none;"/>
+  </div>
+</div>
+
+<!-- FRASE DEL GIORNO -->
+<div id="frase-modal">
+  <div class="frase-box">
+    <div class="frase-icon">💡</div>
+    <div class="frase-text" id="frase-text"></div>
+    <div class="frase-sub" id="frase-sub"></div>
+    <button onclick="closeFrase()">Inizia il turno</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="main-app">
+  <div class="app-shell">
+
+    <div class="app-header">
+      <div class="hbadge">🩺</div>
+      <div>
+        <div class="htitle">Assistente OSS</div>
+        <div class="hsub">Supporto per operatori socio-sanitari</div>
+      </div>
+      <button class="btn-key" onclick="changeKey()">🔑 chiave</button>
+    </div>
+
+    <div class="disclaimer">⚠️ Strumento informativo — non sostituisce il giudizio del team sanitario.</div>
+    <div class="voice-bar" id="voice-bar">
+      <span id="voice-status" style="font-size:11px;color:var(--muted);">🔊 Voce: caricamento...</span>
+    </div>
+
+    <div class="app-nav">
+      <div class="nav-tab active" onclick="switchTab('chat')">💬 Chat</div>
+      <div class="nav-tab" onclick="switchTab('checklist')">✅ Checklist</div>
+      <div class="nav-tab" onclick="switchTab('note')">📝 Note</div>
+      <div class="nav-tab" onclick="switchTab('quiz')">🎯 Quiz</div>
+      <div class="nav-tab" onclick="switchTab('sapevi')">🔍 Lo sapevi?</div>
+    </div>
+
+    <!-- CHAT VIEW -->
+    <div id="view-chat" class="view active" style="flex-direction:column;">
+      <div class="cat-chips">
+        <div class="chip active" onclick="setCategory(this,'Generale')">🌐 Generale</div>
+        <div class="chip" onclick="setCategory(this,'Igiene')">🛁 Igiene</div>
+        <div class="chip" onclick="setCategory(this,'Mobilizzazione')">🦽 Mobilizzazione</div>
+        <div class="chip" onclick="setCategory(this,'Piaghe da decubito')">🩹 Piaghe</div>
+        <div class="chip" onclick="setCategory(this,'Nutrizione e idratazione')">🥗 Nutrizione</div>
+        <div class="chip" onclick="setCategory(this,'Emergenze')">🚨 Emergenze</div>
+        <div class="chip" onclick="setCategory(this,'Demenze e patologie')">🧠 Demenze</div>
+        <div class="chip" onclick="setCategory(this,'Normativa OSS')">📋 Normativa</div>
+        <div class="chip" onclick="setCategory(this,'Relazione con i familiari')">👥 Familiari</div>
+      </div>
+      <div id="mic-status">🎙️ In ascolto... parla adesso</div>
+      <div id="messages">
+        <div class="msg bot">
+          <div class="bubble">Ciao! Puoi scrivere o usare il microfono 🎙️. Seleziona una categoria o fai la tua domanda.</div>
+          <div class="msg-time">Adesso</div>
+        </div>
+      </div>
+      <div class="input-area">
+        <textarea id="user-input" placeholder="Scrivi o usa il microfono..." rows="1" onkeydown="handleKey(event)"></textarea>
+        <button id="mic-btn" onclick="toggleMic()" title="Parla">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6b7f74" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="2" width="6" height="12" rx="3"/>
+            <path d="M5 10a7 7 0 0014 0"/>
+            <line x1="12" y1="19" x2="12" y2="22"/>
+            <line x1="8" y1="22" x2="16" y2="22"/>
+          </svg>
+        </button>
+        <button id="send-btn" onclick="handleSend()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- CHECKLIST VIEW -->
+    <div id="view-checklist" class="view">
+      <div class="turno-selector">
+        <div class="turno-btn active" onclick="setTurno(this,'mattina')">🌅 Mattina</div>
+        <div class="turno-btn" onclick="setTurno(this,'pomeriggio')">☀️ Pomeriggio</div>
+        <div class="turno-btn" onclick="setTurno(this,'notte')">🌙 Notte</div>
+      </div>
+      <div class="checklist-header">
+        <span id="check-progress">0 / 0 completate</span>
+        <div style="display:flex;gap:6px;">
+          <button class="btn-sm" onclick="resetChecklist()">↺ Reset turno</button>
+          <button class="btn-sm red" onclick="clearAllChecks()">✕ Svuota</button>
+        </div>
+      </div>
+      <div id="checklist-items"></div>
+      <div class="add-item-row">
+        <input type="text" id="new-check-input" placeholder="Aggiungi attività..." onkeydown="if(event.key==='Enter')addCheckItem()"/>
+        <button onclick="addCheckItem()">+ Aggiungi</button>
+      </div>
+    </div>
+
+    <!-- NOTE VIEW -->
+    <div id="view-note" class="view">
+      <div class="note-input-area">
+        <textarea id="note-input" placeholder="Scrivi una nota rapida..."></textarea>
+        <div class="note-actions">
+          <button class="btn-mic-note" id="mic-note-btn" onclick="toggleMicNote()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="2" width="6" height="12" rx="3"/>
+              <path d="M5 10a7 7 0 0014 0"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+            </svg>
+            Vocale
+          </button>
+          <button class="btn-save" onclick="saveNote()">💾 Salva nota</button>
+        </div>
+      </div>
+      <div class="notes-list" id="notes-list"></div>
+    </div>
+
+    <!-- QUIZ VIEW -->
+    <div id="view-quiz" class="view">
+      <div class="quiz-card">
+        <div class="quiz-q" id="quiz-question"></div>
+        <div class="quiz-options" id="quiz-options"></div>
+        <div class="quiz-spieg" id="quiz-spieg"></div>
+        <div class="quiz-nav">
+          <div class="quiz-counter" id="quiz-counter"></div>
+          <button onclick="nextQuiz()" id="quiz-next" style="display:none;">Prossima →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LO SAPEVI VIEW -->
+    <div id="view-sapevi" class="view">
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════
+   DATI
+══════════════════════════════════════ */
+const SYSTEM = `Sei un assistente informativo dedicato agli OSS (Operatori Socio-Sanitari) italiani. Fornisci supporto pratico basato sul profilo professionale OSS definito dal D.M. 22 febbraio 2001 e sulle buone pratiche assistenziali italiane.
+
+PERIMETRO DI COMPETENZA OSS: igiene e cura della persona, mobilizzazione e posizionamento, prevenzione delle lesioni da pressione, supporto all'alimentazione e idratazione, osservazione e segnalazione di variazioni delle condizioni del paziente, supporto relazionale e comunicativo con persone affette da demenza, disabilità o disturbi psichiatrici, gestione dell'ambiente di vita, supporto ai familiari, normativa e deontologia OSS.
+
+REGOLA FONDAMENTALE: Se una domanda riguarda valutazione clinica, diagnosi, terapie farmacologiche, medicazioni di ferite, gestione di presidi sanitari come sondini, cateteri o stomie, o qualsiasi atto di competenza infermieristica o medica, NON fornire istruzioni operative. Rispondi invece con una frase chiara che rimanda all'infermiere o al medico responsabile.
+
+SEGNALAZIONE: Per qualsiasi situazione clinica come cadute, lesioni, alterazioni del comportamento, rifiuto del cibo, agitazione o dolore, indica sempre a chi e quando segnalare.
+
+CONTESTI: Puoi rispondere su RSA, assistenza domiciliare, ospedali e comunità terapeutiche. Adatta la risposta al contesto se indicato.
+
+STILE DELLE RISPOSTE - MOLTO IMPORTANTE: Le risposte vengono lette ad alta voce. Rispondi sempre in italiano con frasi brevi e naturali, come farebbe un collega esperto. Massimo 3 o 4 frasi. Non usare mai elenchi puntati, numeri, simboli speciali o trattini. Non usare un tono medico o burocratico. Sii diretto e pratico.
+
+DISCLAIMER IMPLICITO: Questo strumento è puramente informativo e non sostituisce la formazione professionale, il piano assistenziale individuale né il giudizio del team sanitario.`;
+
+const FRASI = [
+  { testo: "La dignità del paziente viene prima di tutto. Ogni gesto di cura è un atto di rispetto.", sub: "Deontologia OSS" },
+  { testo: "Osservare e segnalare è il cuore del lavoro OSS. Un'osservazione tempestiva può fare la differenza.", sub: "Buone pratiche" },
+  { testo: "La comunicazione con il paziente non ha bisogno di molte parole. Un tono calmo e un contatto visivo valgono più di mille spiegazioni.", sub: "Relazione d'aiuto" },
+  { testo: "La mobilizzazione ogni due ore non è solo una regola: è prevenzione attiva della sofferenza.", sub: "Prevenzione lesioni" },
+  { testo: "Il cambio turno è un momento delicato. Una consegna precisa protegge il paziente e il tuo operato.", sub: "Lavoro in équipe" },
+  { testo: "Con i pazienti con demenza, non correggere mai la realtà percepita. Entra nel loro mondo con rispetto.", sub: "Approccio alla demenza" },
+  { testo: "Documentare è proteggere: te stesso, il paziente e l'intera équipe.", sub: "Documentazione" },
+  { testo: "Il silenzio di un paziente non significa che stia bene. Osserva sempre il linguaggio del corpo.", sub: "Osservazione clinica" },
+  { testo: "Chiedere aiuto non è debolezza: è professionalità. Nessun OSS lavora da solo.", sub: "Lavoro in équipe" },
+  { testo: "Ogni paziente ha una storia. Conoscerla rende la cura più umana ed efficace.", sub: "Assistenza centrata sulla persona" },
+];
+
+const CHECKLIST_DEFAULT = {
+  mattina: ["Igiene del mattino", "Alzata e posizionamento", "Colazione e idratazione", "Mobilizzazione", "Riordino letto e ambiente", "Compilazione documentazione"],
+  pomeriggio: ["Igiene pomeridiana se necessaria", "Pranzo e idratazione", "Riposo pomeridiano", "Mobilizzazione", "Attività ricreativa", "Compilazione documentazione"],
+  notte: ["Cena e idratazione", "Igiene serale", "Posizionamento per la notte", "Controllo ogni 2 ore", "Gestione incontinenza notturna", "Compilazione documentazione"],
+};
+
+const QUIZ_DATA = [
+  { q:"Ogni quanto va mobilizzato un paziente allettato per prevenire le piaghe da decubito?", opts:["Ogni 4 ore","Ogni 2 ore","Una volta al turno","Solo su richiesta"], correct:1, spieg:"La mobilizzazione ogni 2 ore è la pratica standard per prevenire le lesioni da pressione nelle prominenze ossee." },
+  { q:"Qual è la posizione corretta durante i pasti per un paziente con disfagia?", opts:["Decubito laterale","Posizione semiseduta a 45°","Seduto a 90°","Decubito supino"], correct:2, spieg:"La posizione seduta a 90° riduce il rischio di aspirazione negli atti deglutitori." },
+  { q:"Cosa deve fare l'OSS se rileva un arrossamento persistente al sacro?", opts:["Applicare crema autonomamente","Segnalare subito all'infermiere","Attendere il giorno successivo","Aumentare la frequenza dei cambi pannolone"], correct:1, spieg:"L'arrossamento persistente è il segnale precoce di una lesione da pressione (stadio 1) e va segnalato immediatamente." },
+  { q:"Come ci si avvicina a un paziente emiplegico durante la mobilizzazione?", opts:["Dal lato sano","Dal lato leso","Non importa il lato","Dal lato con cui il paziente preferisce"], correct:1, spieg:"Avvicinarsi dal lato leso stimola il paziente a usare le sue risorse residue e garantisce maggiore sicurezza." },
+  { q:"L'OSS può somministrare farmaci al paziente?", opts:["Sì, se il medico lo ha prescritto","Sì, solo farmaci da banco","No, è competenza infermieristica","Sì, in caso di emergenza"], correct:2, spieg:"La somministrazione di farmaci è un atto di competenza esclusivamente infermieristica o medica. L'OSS non può eseguirla." },
+  { q:"Con quale frequenza va eseguita l'igiene intima?", opts:["Una volta al giorno","Solo al mattino","Almeno una volta al giorno e dopo ogni episodio di incontinenza","Ogni 6 ore"], correct:2, spieg:"L'igiene intima frequente previene infezioni, lesioni cutanee e garantisce il benessere e la dignità del paziente." },
+  { q:"Come si gestisce un paziente con demenza che rifiuta il pasto?", opts:["Forzare l'alimentazione","Segnalare all'infermiere e provare a cambiare orario o consistenza","Saltare il pasto senza segnalare","Somministrare integratori autonomamente"], correct:1, spieg:"Il rifiuto del pasto va segnalato e annotato. Mai forzare: può causare aspirazione e compromette la relazione di fiducia." },
+  { q:"Cosa fare immediatamente se un paziente cade?", opts:["Sollevarlo subito","Lasciarlo a terra e chiamare l'infermiere","Chiamare i familiari","Accompagnarlo a letto senza segnalare"], correct:1, spieg:"Non spostare mai il paziente caduto: potrebbe esserci una frattura. Bisogna chiamare subito l'infermiere e rassicurare il paziente." },
+];
+
+const SAPEVI_DATA = [
+  { icon:"🧠", tag:"Demenze", tagClass:"tag-green", title:"Demenza di Alzheimer", body:"È la forma di demenza più comune. Colpisce inizialmente la memoria a breve termine. Il paziente può non riconoscere familiari o operatori nelle fasi avanzate. L'approccio validativo — entrare nella realtà del paziente invece di correggerla — riduce l'agitazione e favorisce la cooperazione." },
+  { icon:"🤝", tag:"Relazione", tagClass:"tag-blue", title:"Comunicazione non verbale", body:"Con i pazienti con deficit cognitivi, il linguaggio del corpo vale più delle parole. Un tono di voce calmo, il contatto visivo, un tocco gentile e un sorriso comunicano sicurezza e rispetto. Evitare movimenti bruschi o toni alzati che possono scatenare agitazione." },
+  { icon:"🩹", tag:"Prevenzione", tagClass:"tag-green", title:"Lesioni da pressione — stadi", body:"Stadio 1: arrossamento che non scompare alla pressione. Stadio 2: vescica o erosione superficiale. Stadio 3: perdita di tessuto fino al grasso sottocutaneo. Stadio 4: lesione profonda con esposizione di muscolo o osso. L'OSS deve segnalare subito qualsiasi segno di stadio 1." },
+  { icon:"🥗", tag:"Nutrizione", tagClass:"tag-amber", title:"Disfagia negli anziani", body:"La disfagia (difficoltà a deglutire) è frequente negli anziani e nei pazienti con demenza o esiti di ictus. I segnali sono tosse durante i pasti, voce gorgogliante, rifiuto del cibo. Va segnalata all'infermiere. I cibi vanno adattati in consistenza secondo il piano nutrizionale." },
+  { icon:"🦽", tag:"Mobilizzazione", tagClass:"tag-green", title:"Sindrome da immobilizzazione", body:"Un paziente allettato a lungo rischia: piaghe da decubito, trombosi venosa, polmonite ab ingestis, ipotrofia muscolare e depressione. La mobilizzazione ogni 2 ore, gli esercizi passivi e il cambio di postura sono le armi principali dell'OSS per prevenire queste complicanze." },
+  { icon:"❤️", tag:"Relazione", tagClass:"tag-blue", title:"Gestione del dolore cronico", body:"Molti pazienti anziani non comunicano il dolore verbalmente. Osserva segnali indiretti: smorfie, rigidità, agitazione, rifiuto delle cure, cambiamento del comportamento. Segnala sempre all'infermiere qualsiasi variazione. L'OSS non valuta né tratta il dolore, ma lo osserva e lo segnala." },
+  { icon:"🌙", tag:"Notte", tagClass:"tag-amber", title:"Turno notturno in RSA", body:"Di notte i pazienti con demenza possono manifestare il cosiddetto sundowning: aumento di agitazione e disorientamento al tramonto e nelle ore notturne. Mantenere luci soffuse, routine rassicuranti e voce calma. Evitare di contrastarli e segnalare episodi ricorrenti all'infermiere." },
+];
+
+/* ══════════════════════════════════════
+   STATO
+══════════════════════════════════════ */
+let apiKey = '';
+let elApiKey = '';
+let category = 'Generale';
+let history = [];
+let recognition = null;
+let isListening = false;
+let recognitionNote = null;
+let isListeningNote = false;
+let currentTurno = 'mattina';
+let quizIndex = 0;
+let quizAnswered = false;
+let quizOrder = [];
+
+/* ══════════════════════════════════════
+   INIT
+══════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('oss_api_key');
+  const savedEl = localStorage.getItem('oss_el_key');
+  if (savedEl) elApiKey = savedEl;
+  if (saved && saved.startsWith('sk-ant-')) {
+    apiKey = saved;
+    document.getElementById('api-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = 'block';
+    showFrase();
+  }
+  initSpeech();
+  initSpeechNote();
+  loadVoices();
+  renderChecklist();
+  renderNotes();
+  initQuiz();
+  buildSapevi();
+});
+
+let selectedVoice = null;
+
+function loadVoices() {
+  if (elApiKey) {
+    document.getElementById('voice-status').textContent = '🔊 Voce: Serena (ElevenLabs)';
+    return;
+  }
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length === 0) return;
+  const itVoice = voices.find(v => v.lang.startsWith('it'));
+  selectedVoice = itVoice || voices[0];
+  document.getElementById('voice-status').textContent = `🔊 Voce: ${selectedVoice.name} (browser)`;
+}
+
+window.speechSynthesis.onvoiceschanged = loadVoices;
+
+/* ══════════════════════════════════════
+   API KEY
+══════════════════════════════════════ */
+function saveKey() {
+  const k = document.getElementById('api-key-input').value.trim();
+  if (!k.startsWith('sk-ant-')) { document.getElementById('api-error').style.display='block'; return; }
+  apiKey = k;
+  localStorage.setItem('oss_api_key', k);
+  const elKey = document.getElementById('el-key-input').value.trim();
+  if (elKey) { elApiKey = elKey; localStorage.setItem('oss_el_key', elKey); }
+  document.getElementById('api-error').style.display = 'none';
+  document.getElementById('api-screen').style.display = 'none';
+  document.getElementById('main-app').style.display = 'block';
+  showFrase();
+}
+function changeKey() {
+  apiKey = ''; localStorage.removeItem('oss_api_key');
+  document.getElementById('api-key-input').value = '';
+  document.getElementById('main-app').style.display = 'none';
+  document.getElementById('api-screen').style.display = 'block';
+}
+
+/* ══════════════════════════════════════
+   FRASE DEL GIORNO
+══════════════════════════════════════ */
+function showFrase() {
+  const today = new Date().toDateString();
+  if (localStorage.getItem('oss_frase_date') === today) return;
+  const idx = Math.floor(Date.now() / 86400000) % FRASI.length;
+  document.getElementById('frase-text').textContent = FRASI[idx].testo;
+  document.getElementById('frase-sub').textContent = FRASI[idx].sub;
+  document.getElementById('frase-modal').classList.add('show');
+}
+function closeFrase() {
+  localStorage.setItem('oss_frase_date', new Date().toDateString());
+  document.getElementById('frase-modal').classList.remove('show');
+}
+
+/* ══════════════════════════════════════
+   NAV
+══════════════════════════════════════ */
+function switchTab(tab) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v => { v.classList.remove('active'); v.style.display='none'; });
+  const tabs = ['chat','checklist','note','quiz','sapevi'];
+  document.querySelectorAll('.nav-tab')[tabs.indexOf(tab)].classList.add('active');
+  const el = document.getElementById(`view-${tab}`);
+  el.classList.add('active');
+  el.style.display = 'flex';
+}
+
+/* ══════════════════════════════════════
+   SPEECH — CHAT
+══════════════════════════════════════ */
+function initSpeech() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return;
+  recognition = new SR();
+  recognition.lang = 'it-IT'; recognition.continuous = false; recognition.interimResults = false;
+  recognition.onresult = (e) => { document.getElementById('user-input').value = e.results[0][0].transcript; stopListening(); handleSend(); };
+  recognition.onerror = () => stopListening();
+  recognition.onend   = () => stopListening();
+}
+function toggleMic() {
+  if (!recognition) { alert('Riconoscimento vocale non supportato. Usa Chrome o Edge.'); return; }
+  if (isListening) { stopListening(); return; }
+  navigator.mediaDevices.getUserMedia({audio:true})
+    .then(() => startListening())
+    .catch(() => {
+      alert('⚠️ Microfono bloccato dal browser.\n\nPer abilitarlo apri Edge invece di Chrome: Edge permette il microfono anche da file locale.\n\nOppure scrivi la domanda a mano.');
+    });
+}
+function startListening() {
+  window.speechSynthesis && window.speechSynthesis.cancel();
+  isListening = true;
+  document.getElementById('mic-btn').classList.add('listening');
+  document.getElementById('mic-status').style.display = 'block';
+  recognition.start();
+}
+function stopListening() {
+  isListening = false;
+  document.getElementById('mic-btn').classList.remove('listening');
+  document.getElementById('mic-status').style.display = 'none';
+  try { recognition.stop(); } catch(e) {}
+}
+
+/* ══════════════════════════════════════
+   SPEECH — NOTE
+══════════════════════════════════════ */
+function initSpeechNote() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return;
+  recognitionNote = new SR();
+  recognitionNote.lang = 'it-IT'; recognitionNote.continuous = false; recognitionNote.interimResults = false;
+  recognitionNote.onresult = (e) => { document.getElementById('note-input').value = e.results[0][0].transcript; stopMicNote(); };
+  recognitionNote.onerror = () => stopMicNote();
+  recognitionNote.onend   = () => stopMicNote();
+}
+function toggleMicNote() {
+  if (!recognitionNote) { alert('Riconoscimento vocale non supportato. Usa Chrome o Edge.'); return; }
+  isListeningNote ? stopMicNote() : startMicNote();
+}
+function startMicNote() {
+  isListeningNote = true;
+  document.getElementById('mic-note-btn').classList.add('listening');
+  document.getElementById('mic-note-btn').textContent = '🎙️ In ascolto...';
+  recognitionNote.start();
+}
+function stopMicNote() {
+  isListeningNote = false;
+  const btn = document.getElementById('mic-note-btn');
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0014 0"/><line x1="12" y1="19" x2="12" y2="22"/></svg> Vocale`;
+  btn.classList.remove('listening');
+  try { recognitionNote.stop(); } catch(e) {}
+}
+
+/* ══════════════════════════════════════
+   TTS
+══════════════════════════════════════ */
+const EL_VOICE_ID = 'PS6wM7QnnPTUDE3t4bbl';
+
+function cleanTextForSpeech(text) {
+  return text
+    .replace(/\bOSS\b/g, 'Operatore Socio Sanitario')
+    .replace(/\boss\b/gi, 'Operatore Socio Sanitario')
+    .replace(/\bOss\b/g, 'Operatore Socio Sanitario')
+    .replace(/\b(\d+)\s+(\d+)\s+(\d+)\b/g, '$1$2$3')
+    .replace(/\b(\d+)\s+(\d+)\b/g, '$1$2')
+    .replace(/[*_#•\-–]/g,'')
+    .replace(/\s+/g,' ').trim();
+}
+
+async function speakElevenLabs(text) {
+  try {
+    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${EL_VOICE_ID}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'xi-api-key': elApiKey
+      },
+      body: JSON.stringify({
+        text: text,
+        model_id: 'eleven_multilingual_v2',
+        voice_settings: { stability: 0.5, similarity_boost: 0.75 }
+      })
+    });
+    if (!res.ok) throw new Error('ElevenLabs error');
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    audio.play();
+  } catch(e) {
+    speakBrowser(text);
+  }
+}
+
+function speakBrowser(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'it-IT'; utt.rate = 0.95; utt.pitch = 1;
+  if (selectedVoice) utt.voice = selectedVoice;
+  window.speechSynthesis.speak(utt);
+}
+
+function speak(text) {
+  const clean = cleanTextForSpeech(text);
+  if (elApiKey) { speakElevenLabs(clean); } else { speakBrowser(clean); }
+}
+
+/* ══════════════════════════════════════
+   CHAT
+══════════════════════════════════════ */
+function now() { return new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}); }
+const msgs = document.getElementById('messages');
+const input = document.getElementById('user-input');
+
+function addMsg(text, role, withReplay) {
+  const d = document.createElement('div'); d.className=`msg ${role}`;
+  const safe = text.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  let html = `<div class="bubble">${text.replace(/\n/g,'<br>')}</div><div class="msg-time">${now()}</div>`;
+  if (withReplay) html += `<button class="replay-btn" onclick="speak('${safe}')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg> Riascolta</button>`;
+  d.innerHTML = html; msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight;
+}
+function showTyping() {
+  const d = document.createElement('div'); d.className='msg bot'; d.id='typing';
+  d.innerHTML='<div class="bubble"><div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>';
+  msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight;
+}
+function removeTyping() { const t=document.getElementById('typing'); if(t) t.remove(); }
+
+async function ask(text) {
+  history.push({role:'user',content:text});
+  showTyping();
+  document.getElementById('send-btn').disabled=true;
+  const sys = category!=='Generale' ? SYSTEM+`\n\nContesto: ${category}. Adatta la risposta a questo ambito.` : SYSTEM;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:300,system:sys,messages:history})
+    });
+    const data = await res.json();
+    let reply = 'Errore nella risposta.';
+    if (data.content && Array.isArray(data.content)) {
+      const textBlock = data.content.find(b => b.type === 'text');
+      if (textBlock) reply = textBlock.text;
+    } else if (data.error) {
+      reply = 'Errore API: ' + (data.error.message || JSON.stringify(data.error));
+    }
+    history.push({role:'assistant',content:reply});
+    removeTyping(); addMsg(reply,'bot',true); speak(reply);
+  } catch(e) {
+    removeTyping(); addMsg('Errore di connessione. Controlla la chiave API e la connessione internet.','bot',false);
+  }
+  document.getElementById('send-btn').disabled=false;
+}
+
+function handleSend() {
+  const text=input.value.trim(); if(!text) return;
+  addMsg(text,'user',false); input.value=''; input.style.height='auto'; ask(text);
+}
+function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleSend();} }
+input.addEventListener('input',()=>{ input.style.height='auto'; input.style.height=Math.min(input.scrollHeight,100)+'px'; });
+
+function setCategory(el,cat) {
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active'); category=cat; history=[]; msgs.innerHTML='';
+  addMsg(cat==='Generale'?'Categoria Generale. Fai pure la tua domanda!':`Categoria ${cat} selezionata. Fai la tua domanda!`,'bot',false);
+}
+
+/* ══════════════════════════════════════
+   CHECKLIST
+══════════════════════════════════════ */
+function getCheckKey(turno) { return `oss_check_${turno}`; }
+function getCheckItems(turno) {
+  const saved = localStorage.getItem(getCheckKey(turno));
+  if (saved) return JSON.parse(saved);
+  return CHECKLIST_DEFAULT[turno].map(t => ({label:t, done:false}));
+}
+function saveCheckItems(turno, items) { localStorage.setItem(getCheckKey(turno), JSON.stringify(items)); }
+
+function renderChecklist() {
+  const items = getCheckItems(currentTurno);
+  const container = document.getElementById('checklist-items');
+  container.innerHTML = '';
+  items.forEach((item, i) => {
+    const div = document.createElement('div'); div.className=`check-item${item.done?' done':''}`;
+    div.innerHTML = `
+      <div class="check-box${item.done?' done':''}" onclick="toggleCheck(${i})">
+        ${item.done ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+      </div>
+      <span class="check-label">${item.label}</span>
+      <button class="check-del" onclick="deleteCheck(${i})">✕</button>`;
+    container.appendChild(div);
+  });
+  const done = items.filter(i=>i.done).length;
+  document.getElementById('check-progress').textContent = `${done} / ${items.length} completate`;
+}
+
+function toggleCheck(i) {
+  const items = getCheckItems(currentTurno);
+  items[i].done = !items[i].done;
+  saveCheckItems(currentTurno, items); renderChecklist();
+}
+function deleteCheck(i) {
+  const items = getCheckItems(currentTurno);
+  items.splice(i,1);
+  saveCheckItems(currentTurno, items); renderChecklist();
+}
+function addCheckItem() {
+  const inp = document.getElementById('new-check-input');
+  const val = inp.value.trim(); if(!val) return;
+  const items = getCheckItems(currentTurno);
+  items.push({label:val, done:false});
+  saveCheckItems(currentTurno, items); inp.value=''; renderChecklist();
+}
+function resetChecklist() {
+  const items = getCheckItems(currentTurno).map(i=>({...i,done:false}));
+  saveCheckItems(currentTurno, items); renderChecklist();
+}
+function clearAllChecks() {
+  if(!confirm('Svuotare tutta la checklist?')) return;
+  localStorage.removeItem(getCheckKey(currentTurno)); renderChecklist();
+}
+function setTurno(el, turno) {
+  document.querySelectorAll('.turno-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active'); currentTurno=turno; renderChecklist();
+}
+
+/* ══════════════════════════════════════
+   NOTE RAPIDE
+══════════════════════════════════════ */
+function getNotes() {
+  const s = localStorage.getItem('oss_notes');
+  return s ? JSON.parse(s) : [];
+}
+function saveNotes(notes) { localStorage.setItem('oss_notes', JSON.stringify(notes)); }
+
+function saveNote() {
+  const text = document.getElementById('note-input').value.trim();
+  if (!text) return;
+  const notes = getNotes();
+  notes.unshift({ text, date: new Date().toLocaleString('it-IT',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) });
+  saveNotes(notes);
+  document.getElementById('note-input').value = '';
+  renderNotes();
+}
+
+function deleteNote(i) {
+  const notes = getNotes(); notes.splice(i,1); saveNotes(notes); renderNotes();
+}
+
+function renderNotes() {
+  const notes = getNotes();
+  const list = document.getElementById('notes-list');
+  if (notes.length === 0) { list.innerHTML='<div class="no-notes">Nessuna nota salvata.<br>Scrivi o registra la tua prima nota!</div>'; return; }
+  list.innerHTML = '';
+  notes.forEach((n,i) => {
+    const card = document.createElement('div'); card.className='note-card';
+    card.innerHTML = `<div class="note-text">${n.text}</div><div class="note-meta"><span>${n.date}</span><button class="note-del" onclick="deleteNote(${i})">🗑️</button></div>`;
+    list.appendChild(card);
+  });
+}
+
+/* ══════════════════════════════════════
+   QUIZ
+══════════════════════════════════════ */
+function initQuiz() {
+  quizOrder = [...Array(QUIZ_DATA.length).keys()].sort(()=>Math.random()-.5);
+  quizIndex = 0; renderQuiz();
+}
+function renderQuiz() {
+  const q = QUIZ_DATA[quizOrder[quizIndex]];
+  document.getElementById('quiz-question').textContent = q.q;
+  document.getElementById('quiz-counter').textContent = `${quizIndex+1} di ${QUIZ_DATA.length}`;
+  document.getElementById('quiz-spieg').style.display = 'none';
+  document.getElementById('quiz-next').style.display = 'none';
+  quizAnswered = false;
+  const opts = document.getElementById('quiz-options');
+  opts.innerHTML = '';
+  q.opts.forEach((opt,i) => {
+    const btn = document.createElement('button'); btn.className='quiz-opt'; btn.textContent=opt;
+    btn.onclick = () => answerQuiz(i, q.correct, q.spieg);
+    opts.appendChild(btn);
+  });
+}
+function answerQuiz(chosen, correct, spieg) {
+  if (quizAnswered) return; quizAnswered = true;
+  const btns = document.querySelectorAll('.quiz-opt');
+  btns.forEach((b,i) => { b.disabled=true; if(i===correct) b.classList.add('correct'); else if(i===chosen) b.classList.add('wrong'); });
+  const spiegEl = document.getElementById('quiz-spieg');
+  spiegEl.textContent = spieg; spiegEl.style.display='block';
+  document.getElementById('quiz-next').style.display='block';
+}
+function nextQuiz() {
+  quizIndex = (quizIndex+1) % QUIZ_DATA.length;
+  if (quizIndex === 0) quizOrder = [...Array(QUIZ_DATA.length).keys()].sort(()=>Math.random()-.5);
+  renderQuiz();
+}
+
+/* ══════════════════════════════════════
+   LO SAPEVI
+══════════════════════════════════════ */
+function buildSapevi() {
+  const container = document.getElementById('view-sapevi');
+  SAPEVI_DATA.forEach(s => {
+    const card = document.createElement('div'); card.className='sapevi-card';
+    card.innerHTML = `
+      <div class="sapevi-head" onclick="toggleSapevi(this)">
+        <div class="sapevi-title">${s.icon} ${s.title}</div>
+        <span class="sapevi-arr">▼</span>
+      </div>
+      <div class="sapevi-body">
+        <span class="sapevi-tag ${s.tagClass}">${s.tag}</span><br>
+        ${s.body}
+      </div>`;
+    container.appendChild(card);
+  });
+}
+function toggleSapevi(head) {
+  const body = head.nextElementSibling;
+  const arr  = head.querySelector('.sapevi-arr');
+  const open = body.style.display==='block';
+  body.style.display = open?'none':'block';
+  arr.style.transform = open?'':'rotate(180deg)';
+}
+</script>
+</body>
+</html>
