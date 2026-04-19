@@ -247,6 +247,8 @@ body {
     <div class="frase-text" id="frase-text"></div>
     <div class="frase-sub" id="frase-sub"></div>
     <button onclick="closeFrase()">Inizia il turno</button>
+    <br><br>
+    <button onclick="testAudio()" style="background:none;border:1px solid var(--border);color:var(--muted);font-size:12px;padding:6px 16px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;">🔊 Test audio</button>
   </div>
 </div>
 
@@ -526,6 +528,14 @@ function showFrase() {
 function closeFrase() {
   localStorage.setItem('oss_frase_date', new Date().toDateString());
   document.getElementById('frase-modal').classList.remove('show');
+}
+
+function testAudio() {
+  const utt = new SpeechSynthesisUtterance('Ciao, il test audio funziona!');
+  utt.lang = 'it-IT';
+  utt.rate = 0.95;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utt);
 }
 
 /* ══════════════════════════════════════
