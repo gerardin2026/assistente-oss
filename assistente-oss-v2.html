@@ -201,8 +201,9 @@ body {
 .quiz-counter { font-size:12px; color:var(--muted); }
 
 /* ── LO SAPEVI ── */
-#view-sapevi { overflow-y:auto; padding:14px; gap:10px; }
-.sapevi-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius-sm); overflow:hidden; }
+#view-sapevi { padding:14px; gap:10px; overflow:hidden; }
+.sapevi-container { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px; }
+.sapevi-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius-sm); overflow:hidden; flex-shrink:0; }
 .sapevi-head { padding:13px 16px; background:var(--g-xpale); display:flex; justify-content:space-between; align-items:center; cursor:pointer; }
 .sapevi-head:hover { background:var(--g-pale); }
 .sapevi-title { font-size:13px; font-weight:500; color:var(--text); display:flex; align-items:center; gap:8px; }
@@ -369,6 +370,7 @@ body {
 
     <!-- LO SAPEVI VIEW -->
     <div id="view-sapevi" class="view">
+      <div class="sapevi-container"></div>
     </div>
 
   </div>
@@ -919,7 +921,7 @@ function nextQuiz() {
    LO SAPEVI
 ══════════════════════════════════════ */
 function buildSapevi() {
-  const container = document.getElementById('view-sapevi');
+  const container = document.querySelector('#view-sapevi .sapevi-container');
   SAPEVI_DATA.forEach(s => {
     const card = document.createElement('div'); card.className='sapevi-card';
     card.innerHTML = `
