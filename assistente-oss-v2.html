@@ -219,6 +219,102 @@ body {
   .app-shell { border-radius:0; border:none; height:100vh; max-height:100vh; box-shadow:none; }
   #main-app { max-width:100%; }
 }
+
+/* ── IL MIO TURNO ── */
+#view-turni { overflow:hidden; padding:0; }
+.turni-container { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+
+/* Tab Navigation */
+.turni-tabs { display:flex; border-bottom:1px solid var(--border); background:var(--g-xpale); flex-shrink:0; }
+.turni-tab { flex:1; padding:10px 12px; font-size:12px; color:var(--muted); cursor:pointer; font-weight:500; border-bottom:2px solid transparent; user-select:none; text-align:center; background:none; border:none; font-family:'DM Sans',sans-serif; transition:all .13s; }
+.turni-tab:hover { color:var(--text); background:var(--g-pale); }
+.turni-tab.active { color:var(--g-dark); border-bottom-color:var(--g-mid); background:#fff; }
+
+/* Tab Content */
+.turni-content { display:none; flex:1; flex-direction:column; overflow-y:auto; padding:14px; gap:12px; }
+.turni-content.active { display:flex; }
+
+/* Cards */
+.turni-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px; }
+.turni-card-title { font-size:14px; font-weight:600; color:var(--text); margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+
+/* Forms */
+.turni-form-row { display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+.turni-form-group { flex:1; min-width:120px; }
+.turni-form-group.full-width { flex-basis:100%; }
+.turni-label { font-size:11px; color:var(--muted); margin-bottom:4px; font-weight:500; }
+.turni-input { width:100%; border:1px solid var(--border); border-radius:var(--radius-xs); padding:8px 12px; font-size:13px; font-family:'DM Sans',sans-serif; color:var(--text); background:#fff; outline:none; transition:border .15s; }
+.turni-input:focus { border-color:var(--g-mid); }
+.turni-select { width:100%; border:1px solid var(--border); border-radius:var(--radius-xs); padding:8px 12px; font-size:13px; font-family:'DM Sans',sans-serif; color:var(--text); background:#fff; cursor:pointer; outline:none; transition:border .15s; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7f74' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; padding-right:30px; }
+.turni-select:focus { border-color:var(--g-mid); }
+.turni-form-buttons { display:flex; gap:8px; margin-top:12px; }
+
+/* Color Grid */
+.turni-color-grid { display:grid; grid-template-columns:repeat(10, 1fr); gap:4px; margin-bottom:8px; }
+.turni-color-option { width:100%; height:24px; border-radius:4px; border:2px solid transparent; cursor:pointer; transition:all .15s; }
+.turni-color-option:hover { transform:scale(1.1); }
+.turni-color-option.selected { border-color:var(--text); box-shadow:0 0 0 1px #fff; }
+
+/* Template List */
+.turni-template-list { display:flex; flex-direction:column; gap:8px; }
+.turni-template-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--border); border-radius:var(--radius-xs); background:var(--g-xpale); transition:all .13s; }
+.turni-template-item:hover { border-color:var(--g-mid); }
+.turni-template-color { width:14px; height:14px; border-radius:3px; flex-shrink:0; }
+.turni-template-info { flex:1; }
+.turni-template-name { font-size:13px; font-weight:500; color:var(--text); }
+.turni-template-time { font-size:11px; color:var(--muted); }
+.turni-template-actions { display:flex; gap:4px; }
+
+/* Month Navigation */
+.turni-month-nav { display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:12px; }
+.turni-month-nav button { width:36px; height:36px; border:1px solid var(--border); border-radius:var(--radius-xs); background:#fff; color:var(--text); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:14px; transition:all .13s; }
+.turni-month-nav button:hover { background:var(--g-mid); color:#fff; border-color:var(--g-mid); }
+#turniMonthDisplay, #turniSummaryMonthDisplay { font-size:16px; font-weight:600; color:var(--text); min-width:140px; text-align:center; }
+
+/* Stats Row */
+.turni-stats-row { display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin-bottom:12px; }
+.turni-stat { background:var(--g-xpale); border:1px solid var(--border); border-radius:var(--radius-xs); padding:10px; text-align:center; }
+.turni-stat-value { font-size:18px; font-weight:600; color:var(--g-mid); }
+.turni-stat-label { font-size:10px; color:var(--muted); margin-top:2px; }
+
+/* Calendar Grid */
+.turni-calendar-grid { display:grid; grid-template-columns:repeat(7, 1fr); gap:4px; flex:1; }
+.turni-day-header { text-align:center; padding:8px 4px; font-size:10px; font-weight:600; color:var(--muted); text-transform:uppercase; }
+.turni-day-cell { background:#fff; border:1px solid var(--border); border-radius:var(--radius-xs); min-height:60px; padding:6px; cursor:pointer; position:relative; transition:all .13s; }
+.turni-day-cell:hover { border-color:var(--g-mid); transform:scale(1.02); }
+.turni-day-cell.other-month { opacity:0.4; background:var(--bg); }
+.turni-day-cell.today { border-color:var(--g-mid); box-shadow:0 0 0 2px var(--g-pale); }
+.turni-day-cell.has-turno { border-color:transparent; }
+.turni-day-cell-bg { position:absolute; inset:0; opacity:0.15; z-index:0; border-radius:var(--radius-xs); }
+.turni-day-number { position:relative; z-index:1; font-size:12px; font-weight:500; margin-bottom:4px; }
+.turni-day-turno { position:relative; z-index:1; font-size:9px; font-weight:600; padding:2px 4px; border-radius:3px; display:flex; flex-direction:column; gap:1px; }
+
+/* Summary Grid */
+.turni-summary-grid { display:grid; grid-template-columns:repeat(7, 1fr); gap:6px; }
+.turni-summary-day { background:#fff; border:1px solid var(--border); border-radius:var(--radius-xs); padding:8px; text-align:center; min-height:70px; }
+.turni-summary-day.has-turno { border-color:transparent; position:relative; overflow:hidden; }
+.turni-summary-day-bg { position:absolute; inset:0; opacity:0.2; z-index:0; }
+.turni-summary-day-content { position:relative; z-index:1; }
+.turni-summary-day-number { font-size:12px; font-weight:600; margin-bottom:4px; }
+.turni-summary-day-turno { font-size:9px; padding:3px; border-radius:3px; }
+.turni-summary-day-rest { font-size:10px; color:var(--muted); padding-top:10px; }
+
+/* Modal */
+.turni-modal { position:fixed; inset:0; background:rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center; z-index:1000; }
+.turni-modal.active { display:flex; }
+.turni-modal-content { background:#fff; border-radius:var(--radius); padding:20px; width:90%; max-width:320px; box-shadow:var(--shadow); }
+.turni-modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+.turni-modal-title { font-size:16px; font-weight:600; color:var(--text); }
+.turni-modal-close { background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer; padding:0; width:28px; height:28px; display:flex; align-items:center; justify-content:center; border-radius:50%; }
+.turni-modal-close:hover { background:var(--red-pale); color:var(--red); }
+.turni-current-assignment { background:var(--g-xpale); border:1px solid var(--border); border-radius:var(--radius-xs); padding:10px; margin-bottom:12px; font-size:12px; }
+
+@media (max-width:480px) {
+  .turni-calendar-grid { min-height:auto; }
+  .turni-day-cell { min-height:50px; }
+  .turni-summary-grid { grid-template-columns:repeat(4, 1fr); }
+  .turni-stats-row { grid-template-columns:repeat(2, 1fr); }
+}
 </style>
 </head>
 <body>
@@ -277,6 +373,7 @@ body {
       <div class="nav-tab" onclick="switchTab('note')">📝 Note</div>
       <div class="nav-tab" onclick="switchTab('quiz')">🎯 Quiz</div>
       <div class="nav-tab" onclick="switchTab('sapevi')">🔍 Lo sapevi?</div>
+      <div class="nav-tab" onclick="switchTab('turni')">📅 Il Mio Turno</div>
     </div>
 
     <!-- CHAT VIEW -->
@@ -371,6 +468,168 @@ body {
     <!-- LO SAPEVI VIEW -->
     <div id="view-sapevi" class="view">
       <div class="sapevi-container"></div>
+    </div>
+
+    <!-- IL MIO TURNO VIEW -->
+    <div id="view-turni" class="view">
+      <div class="turni-container">
+        <!-- Tab Navigation -->
+        <div class="turni-tabs">
+          <button class="turni-tab active" data-turni-tab="orari" onclick="switchTurniTab('orari')">Orari Tipo</button>
+          <button class="turni-tab" data-turni-tab="calendario" onclick="switchTurniTab('calendario')">Calendario</button>
+          <button class="turni-tab" data-turni-tab="riepilogo" onclick="switchTurniTab('riepilogo')">Riepilogo</button>
+        </div>
+
+        <!-- Tab 1: Orari Tipo -->
+        <div id="turni-orari" class="turni-content active">
+          <div class="turni-card">
+            <div class="turni-card-title">🕐 Crea nuovo orario tipo</div>
+            <form id="turniForm">
+              <input type="hidden" id="turniEditIndex" value="-1">
+              <div class="turni-form-row">
+                <div class="turni-form-group full-width">
+                  <div class="turni-label">Nome orario</div>
+                  <input type="text" class="turni-input" id="turniName" placeholder="Es: Mattina, Pomeriggio, Notte..." required>
+                </div>
+              </div>
+              <div class="turni-form-row">
+                <div class="turni-form-group full-width">
+                  <div class="turni-label">Colore</div>
+                  <div class="turni-color-grid" id="turniColorGrid"></div>
+                  <input type="hidden" id="turniSelectedColor" value="#1D9E75">
+                </div>
+              </div>
+              <div class="turni-form-row">
+                <div class="turni-form-group">
+                  <div class="turni-label">Inizio turno</div>
+                  <input type="time" class="turni-input" id="turniStartTime" required>
+                </div>
+                <div class="turni-form-group">
+                  <div class="turni-label">Fine turno</div>
+                  <input type="time" class="turni-input" id="turniEndTime" required>
+                </div>
+              </div>
+              <div class="turni-form-row">
+                <div class="turni-form-group full-width">
+                  <div class="turni-label">Durata pausa (non conteggiata)</div>
+                  <select class="turni-select" id="turniBreakDuration">
+                    <option value="0">Nessuna pausa</option>
+                    <option value="15">15 minuti</option>
+                    <option value="30" selected>30 minuti</option>
+                    <option value="45">45 minuti</option>
+                    <option value="60">1 ora</option>
+                    <option value="90">1 ora e 30 minuti</option>
+                  </select>
+                </div>
+              </div>
+              <div class="turni-form-buttons">
+                <button type="button" class="btn-sm" id="turniCancelEdit" onclick="cancelTurniEdit()" style="display:none;">Annulla</button>
+                <button type="submit" class="btn-sm" id="turniSubmitBtn">➕ Aggiungi Orario</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="turni-card">
+            <div class="turni-card-title">📋 Orari registrati</div>
+            <div class="turni-template-list" id="turniTemplateList"></div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Calendario -->
+        <div id="turni-calendario" class="turni-content">
+          <div class="turni-month-nav">
+            <button onclick="changeTurniMonth(-1)">◀</button>
+            <div id="turniMonthDisplay">Gennaio 2025</div>
+            <button onclick="changeTurniMonth(1)">▶</button>
+          </div>
+          <div class="turni-stats-row">
+            <div class="turni-stat">
+              <div class="turni-stat-value" id="turniMonthShifts">0</div>
+              <div class="turni-stat-label">Giorni lavorativi</div>
+            </div>
+            <div class="turni-stat">
+              <div class="turni-stat-value" id="turniMonthTotalHours">0h</div>
+              <div class="turni-stat-label">Ore totali</div>
+            </div>
+            <div class="turni-stat">
+              <div class="turni-stat-value" id="turniMonthBreaks">0h</div>
+              <div class="turni-stat-label">Ore pausa</div>
+            </div>
+            <div class="turni-stat">
+              <div class="turni-stat-value" id="turniMonthWorkedHours">0h</div>
+              <div class="turni-stat-label">Ore lavorate</div>
+            </div>
+          </div>
+          <div class="turni-calendar-grid" id="turniCalendarGrid">
+            <div class="turni-day-header">Dom</div>
+            <div class="turni-day-header">Lun</div>
+            <div class="turni-day-header">Mar</div>
+            <div class="turni-day-header">Mer</div>
+            <div class="turni-day-header">Gio</div>
+            <div class="turni-day-header">Ven</div>
+            <div class="turni-day-header">Sab</div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Riepilogo -->
+        <div id="turni-riepilogo" class="turni-content">
+          <div class="turni-month-nav">
+            <button onclick="changeTurniSummaryMonth(-1)">◀</button>
+            <div id="turniSummaryMonthDisplay">Gennaio 2025</div>
+            <button onclick="changeTurniSummaryMonth(1)">▶</button>
+          </div>
+          <div class="turni-stats-row">
+            <div class="turni-stat">
+              <div class="turni-stat-value" id="turniSummaryShifts">0</div>
+              <div class="turni-stat-label">Giorni lavorativi</div>
+            </div>
+            <div class="turni-stat">
+              <div class="turni-stat-value" id="turniSummaryTotalHours">0h</div>
+              <div class="turni-stat-label">Ore totali</div>
+            </div>
+            <div class="turni-stat">
+              <div class="turni-stat-value" id="turniSummaryBreaks">0h</div>
+              <div class="turni-stat-label">Ore pausa</div>
+            </div>
+            <div class="turni-stat">
+              <div class="turni-stat-value" id="turniSummaryWorkedHours">0h</div>
+              <div class="turni-stat-label">Ore lavorate</div>
+            </div>
+            <div class="turni-stat">
+              <div class="turni-stat-value" id="turniSummaryDaysOff">0</div>
+              <div class="turni-stat-label">Giorni riposo</div>
+            </div>
+          </div>
+          <div class="turni-summary-grid" id="turniSummaryGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal per assegnazione turno -->
+    <div class="turni-modal" id="turniModal">
+      <div class="turni-modal-content">
+        <div class="turni-modal-header">
+          <div class="turni-modal-title" id="turniModalTitle">Assegna Turno</div>
+          <button class="turni-modal-close" onclick="closeTurniModal()">✕</button>
+        </div>
+        <form id="turniAssignForm" onsubmit="saveTurniAssignment(event)">
+          <div class="turni-current-assignment" id="turniCurrentAssignment">Nessun turno assegnato</div>
+          <div class="turni-form-group">
+            <div class="turni-label">Seleziona turno</div>
+            <select class="turni-select" id="turniScheduleSelect">
+              <option value="">-- Nessun turno --</option>
+            </select>
+          </div>
+          <div class="turni-form-group">
+            <div class="turni-label">Note (opzionale)</div>
+            <input type="text" class="turni-input" id="turniDayNote" placeholder="Es. Straordinario...">
+          </div>
+          <div class="turni-form-buttons">
+            <button type="button" class="btn-sm" onclick="closeTurniModal()">Annulla</button>
+            <button type="submit" class="btn-sm">Salva</button>
+          </div>
+        </form>
+      </div>
     </div>
 
   </div>
@@ -546,7 +805,7 @@ function testAudio() {
 function switchTab(tab) {
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.view').forEach(v => { v.classList.remove('active'); v.style.display='none'; });
-  const tabs = ['chat','checklist','note','quiz','sapevi'];
+  const tabs = ['chat','checklist','note','quiz','sapevi','turni'];
   document.querySelectorAll('.nav-tab')[tabs.indexOf(tab)].classList.add('active');
   const el = document.getElementById(`view-${tab}`);
   el.classList.add('active');
@@ -943,6 +1202,402 @@ function toggleSapevi(head) {
   body.style.display = open?'none':'block';
   arr.style.transform = open?'':'rotate(180deg)';
 }
+
+/* ══════════════════════════════════════
+   IL MIO TURNO
+══════════════════════════════════════ */
+const TURNI_COLORS = [
+  '#1D9E75', '#0a5c44', '#5DCAA5', '#2980b9', '#3498db', '#9b59b6',
+  '#e74c3c', '#e67e22', '#f1c40f', '#2ecc71', '#1abc9c', '#16a085',
+  '#34495e', '#7f8c8d', '#c0392b', '#d35400', '#f39c12', '#27ae60',
+  '#8e44ad', '#2c3e50', '#95a5a6', '#bdc3c7', '#7cb342', '#43a047'
+];
+
+let turniTemplates = [];
+let turniAssignments = {};
+let turniCurrentDate = new Date();
+let turniSelectedDate = null;
+let turniSelectedColorIndex = 0;
+let turniEditingIndex = -1;
+
+const TURNI_MONTHS = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+
+function initTurni() {
+  const savedTemplates = localStorage.getItem('oss_turni_templates');
+  const savedAssignments = localStorage.getItem('oss_turni_assignments');
+  if (savedTemplates) turniTemplates = JSON.parse(savedTemplates);
+  if (savedAssignments) turniAssignments = JSON.parse(savedAssignments);
+  initTurniColorGrid();
+  renderTurniTemplates();
+  renderTurniCalendar();
+  updateTurniScheduleSelect();
+
+  document.getElementById('turniForm').addEventListener('submit', saveTurniTemplate);
+}
+
+function switchTurniTab(tab) {
+  document.querySelectorAll('.turni-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.turni-content').forEach(c => c.classList.remove('active'));
+  document.querySelector(`[data-turni-tab="${tab}"]`).classList.add('active');
+  document.getElementById(`turni-${tab}`).classList.add('active');
+  if (tab === 'calendario') renderTurniCalendar();
+  if (tab === 'riepilogo') renderTurniSummary();
+}
+
+function initTurniColorGrid() {
+  const grid = document.getElementById('turniColorGrid');
+  grid.innerHTML = '';
+  TURNI_COLORS.forEach((color, i) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'turni-color-option' + (i === turniSelectedColorIndex ? ' selected' : '');
+    btn.style.background = color;
+    btn.onclick = () => selectTurniColor(i);
+    grid.appendChild(btn);
+  });
+}
+
+function selectTurniColor(index) {
+  turniSelectedColorIndex = index;
+  document.getElementById('turniSelectedColor').value = TURNI_COLORS[index];
+  document.querySelectorAll('.turni-color-option').forEach((btn, i) => {
+    btn.classList.toggle('selected', i === index);
+  });
+}
+
+function saveTurniTemplate(e) {
+  e.preventDefault();
+  const name = document.getElementById('turniName').value.trim();
+  const color = document.getElementById('turniSelectedColor').value;
+  const startTime = document.getElementById('turniStartTime').value;
+  const endTime = document.getElementById('turniEndTime').value;
+  const breakDuration = parseInt(document.getElementById('turniBreakDuration').value);
+
+  if (!name || !startTime || !endTime) return;
+
+  const template = { name, color, startTime, endTime, breakDuration };
+  if (turniEditingIndex >= 0) {
+    turniTemplates[turniEditingIndex] = template;
+  } else {
+    turniTemplates.push(template);
+  }
+
+  localStorage.setItem('oss_turni_templates', JSON.stringify(turniTemplates));
+  resetTurniForm();
+  renderTurniTemplates();
+  updateTurniScheduleSelect();
+}
+
+function resetTurniForm() {
+  turniEditingIndex = -1;
+  document.getElementById('turniEditIndex').value = -1;
+  document.getElementById('turniName').value = '';
+  document.getElementById('turniStartTime').value = '';
+  document.getElementById('turniEndTime').value = '';
+  document.getElementById('turniBreakDuration').value = '30';
+  turniSelectedColorIndex = 0;
+  selectTurniColor(0);
+  document.getElementById('turniSubmitBtn').textContent = '➕ Aggiungi Orario';
+  document.getElementById('turniCancelEdit').style.display = 'none';
+}
+
+function cancelTurniEdit() {
+  resetTurniForm();
+}
+
+function editTurniTemplate(index) {
+  const t = turniTemplates[index];
+  turniEditingIndex = index;
+  document.getElementById('turniEditIndex').value = index;
+  document.getElementById('turniName').value = t.name;
+  document.getElementById('turniStartTime').value = t.startTime;
+  document.getElementById('turniEndTime').value = t.endTime;
+  document.getElementById('turniBreakDuration').value = t.breakDuration || 0;
+
+  const colorIdx = TURNI_COLORS.indexOf(t.color);
+  if (colorIdx !== -1) selectTurniColor(colorIdx);
+
+  document.getElementById('turniSubmitBtn').textContent = '💾 Salva Modifiche';
+  document.getElementById('turniCancelEdit').style.display = 'inline-block';
+}
+
+function deleteTurniTemplate(index) {
+  if (!confirm('Eliminare questo orario?')) return;
+  turniTemplates.splice(index, 1);
+  localStorage.setItem('oss_turni_templates', JSON.stringify(turniTemplates));
+  renderTurniTemplates();
+  updateTurniScheduleSelect();
+  if (turniEditingIndex === index) resetTurniForm();
+}
+
+function renderTurniTemplates() {
+  const list = document.getElementById('turniTemplateList');
+  if (turniTemplates.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">Nessun orario registrato</div>';
+    return;
+  }
+  list.innerHTML = turniTemplates.map((t, i) => {
+    const totalHours = calcTurniHours(t.startTime, t.endTime);
+    const workedHours = totalHours - (t.breakDuration || 0) / 60;
+    const breakText = t.breakDuration > 0 ? ` • Pausa ${t.breakDuration}min` : '';
+    return `<div class="turni-template-item">
+      <div class="turni-template-color" style="background:${t.color}"></div>
+      <div class="turni-template-info">
+        <div class="turni-template-name">${t.name}</div>
+        <div class="turni-template-time">${t.startTime}-${t.endTime} (${workedHours.toFixed(1)}h)${breakText}</div>
+      </div>
+      <div class="turni-template-actions">
+        <button class="btn-sm" onclick="editTurniTemplate(${i})">✏️</button>
+        <button class="btn-sm red" onclick="deleteTurniTemplate(${i})">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function calcTurniHours(start, end) {
+  if (!start || !end) return 0;
+  const [sh, sm] = start.split(':').map(Number);
+  const [eh, em] = end.split(':').map(Number);
+  let diff = (eh * 60 + em) - (sh * 60 + sm);
+  if (diff < 0) diff += 24 * 60;
+  return diff / 60;
+}
+
+function updateTurniScheduleSelect() {
+  const select = document.getElementById('turniScheduleSelect');
+  select.innerHTML = '<option value="">-- Nessun turno --</option>';
+  turniTemplates.forEach((t, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `${t.name} (${t.startTime}-${t.endTime})`;
+    select.appendChild(opt);
+  });
+}
+
+function dateToTurniKey(date) {
+  const d = new Date(date);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function renderTurniCalendar() {
+  const grid = document.getElementById('turniCalendarGrid');
+  const year = turniCurrentDate.getFullYear();
+  const month = turniCurrentDate.getMonth();
+  document.getElementById('turniMonthDisplay').textContent = `${TURNI_MONTHS[month]} ${year}`;
+
+  // Remove existing cells
+  grid.querySelectorAll('.turni-day-cell').forEach(c => c.remove());
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const lastDay = new Date(year, month + 1, 0).getDate();
+  const prevMonthLastDay = new Date(year, month, 0).getDate();
+  const today = new Date();
+  const todayKey = dateToTurniKey(today);
+
+  let dayCounter = 1, nextMonthDay = 1;
+
+  for (let i = 0; i < 42; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'turni-day-cell';
+    let displayDay, cellDate, isOther = false;
+
+    if (i < firstDay) {
+      displayDay = prevMonthLastDay - firstDay + i + 1;
+      cellDate = new Date(year, month - 1, displayDay);
+      isOther = true;
+    } else if (dayCounter <= lastDay) {
+      displayDay = dayCounter;
+      cellDate = new Date(year, month, dayCounter++);
+    } else {
+      displayDay = nextMonthDay;
+      cellDate = new Date(year, month + 1, nextMonthDay++);
+      isOther = true;
+    }
+
+    if (isOther) cell.classList.add('other-month');
+    const dateKey = dateToTurniKey(cellDate);
+    if (dateKey === todayKey) cell.classList.add('today');
+
+    const dayNum = document.createElement('div');
+    dayNum.className = 'turni-day-number';
+    dayNum.textContent = displayDay;
+    cell.appendChild(dayNum);
+
+    const assignment = turniAssignments[dateKey];
+    if (assignment && assignment.templateIndex != null && turniTemplates[assignment.templateIndex]) {
+      const t = turniTemplates[assignment.templateIndex];
+      cell.classList.add('has-turno');
+      const bg = document.createElement('div');
+      bg.className = 'turni-day-cell-bg';
+      bg.style.background = t.color;
+      cell.appendChild(bg);
+
+      const turno = document.createElement('div');
+      turno.className = 'turni-day-turno';
+      turno.style.background = t.color;
+      turno.style.color = getTurniContrastColor(t.color);
+      turno.innerHTML = `<span>${t.name}</span><span style="font-size:8px;opacity:0.8;">${t.startTime}-${t.endTime}</span>`;
+      cell.appendChild(turno);
+    }
+
+    cell.onclick = () => openTurniModal(cellDate);
+    grid.appendChild(cell);
+  }
+  updateTurniCalendarStats();
+}
+
+function getTurniContrastColor(hex) {
+  const r = parseInt(hex.slice(1,3), 16);
+  const g = parseInt(hex.slice(3,5), 16);
+  const b = parseInt(hex.slice(5,7), 16);
+  const lum = (0.299*r + 0.587*g + 0.114*b) / 255;
+  return lum > 0.5 ? '#1a2e22' : '#fff';
+}
+
+function updateTurniCalendarStats() {
+  const year = turniCurrentDate.getFullYear();
+  const month = turniCurrentDate.getMonth();
+  let workingDays = 0, totalHours = 0, totalBreaks = 0;
+
+  Object.keys(turniAssignments).forEach(key => {
+    const [y, m] = key.split('-').map(Number);
+    if (y === year && m === month + 1) {
+      const a = turniAssignments[key];
+      if (a && a.templateIndex != null && turniTemplates[a.templateIndex]) {
+        const t = turniTemplates[a.templateIndex];
+        workingDays++;
+        totalHours += calcTurniHours(t.startTime, t.endTime);
+        totalBreaks += (t.breakDuration || 0) / 60;
+      }
+    }
+  });
+
+  document.getElementById('turniMonthShifts').textContent = workingDays;
+  document.getElementById('turniMonthTotalHours').textContent = `${totalHours.toFixed(1)}h`;
+  document.getElementById('turniMonthBreaks').textContent = `${totalBreaks.toFixed(1)}h`;
+  document.getElementById('turniMonthWorkedHours').textContent = `${(totalHours - totalBreaks).toFixed(1)}h`;
+}
+
+function changeTurniMonth(delta) {
+  turniCurrentDate.setMonth(turniCurrentDate.getMonth() + delta);
+  renderTurniCalendar();
+}
+
+function openTurniModal(date) {
+  turniSelectedDate = date;
+  const dateKey = dateToTurniKey(date);
+  const formatted = date.toLocaleDateString('it-IT', { weekday:'long', day:'numeric', month:'long' });
+  document.getElementById('turniModalTitle').textContent = formatted;
+
+  const assignment = turniAssignments[dateKey];
+  const currentDiv = document.getElementById('turniCurrentAssignment');
+  if (assignment && assignment.templateIndex != null && turniTemplates[assignment.templateIndex]) {
+    const t = turniTemplates[assignment.templateIndex];
+    currentDiv.innerHTML = `<span style="display:inline-block;width:10px;height:10px;background:${t.color};border-radius:2px;margin-right:6px;"></span>${t.name} (${t.startTime}-${t.endTime})`;
+    document.getElementById('turniScheduleSelect').value = assignment.templateIndex;
+    document.getElementById('turniDayNote').value = assignment.note || '';
+  } else {
+    currentDiv.textContent = 'Nessun turno assegnato';
+    document.getElementById('turniScheduleSelect').value = '';
+    document.getElementById('turniDayNote').value = '';
+  }
+  document.getElementById('turniModal').classList.add('active');
+}
+
+function closeTurniModal() {
+  document.getElementById('turniModal').classList.remove('active');
+  turniSelectedDate = null;
+}
+
+function saveTurniAssignment(e) {
+  e.preventDefault();
+  if (!turniSelectedDate) return;
+  const dateKey = dateToTurniKey(turniSelectedDate);
+  const templateIndex = document.getElementById('turniScheduleSelect').value;
+  const note = document.getElementById('turniDayNote').value.trim();
+
+  if (templateIndex === '') {
+    delete turniAssignments[dateKey];
+  } else {
+    turniAssignments[dateKey] = { templateIndex: parseInt(templateIndex), note };
+  }
+
+  localStorage.setItem('oss_turni_assignments', JSON.stringify(turniAssignments));
+  closeTurniModal();
+  renderTurniCalendar();
+}
+
+function renderTurniSummary() {
+  const grid = document.getElementById('turniSummaryGrid');
+  const year = turniCurrentDate.getFullYear();
+  const month = turniCurrentDate.getMonth();
+  document.getElementById('turniSummaryMonthDisplay').textContent = `${TURNI_MONTHS[month]} ${year}`;
+
+  grid.innerHTML = '';
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const weekDays = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+
+  let workingDays = 0, totalHours = 0, totalBreaks = 0, daysOff = 0;
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(year, month, day);
+    const dateKey = dateToTurniKey(date);
+    const dayCard = document.createElement('div');
+    dayCard.className = 'turni-summary-day';
+
+    const assignment = turniAssignments[dateKey];
+    if (assignment && assignment.templateIndex != null && turniTemplates[assignment.templateIndex]) {
+      const t = turniTemplates[assignment.templateIndex];
+      workingDays++;
+      const hours = calcTurniHours(t.startTime, t.endTime);
+      const breakH = (t.breakDuration || 0) / 60;
+      totalHours += hours;
+      totalBreaks += breakH;
+
+      dayCard.classList.add('has-turno');
+      const bg = document.createElement('div');
+      bg.className = 'turni-summary-day-bg';
+      bg.style.background = t.color;
+      dayCard.appendChild(bg);
+
+      const content = document.createElement('div');
+      content.className = 'turni-summary-day-content';
+      content.innerHTML = `
+        <div class="turni-summary-day-number">${day}</div>
+        <div class="turni-summary-day-turno" style="background:${t.color};color:${getTurniContrastColor(t.color)}">
+          <div>${t.name}</div>
+          <div style="font-size:8px;">${t.startTime}-${t.endTime}</div>
+        </div>
+      `;
+      dayCard.appendChild(content);
+    } else {
+      daysOff++;
+      dayCard.innerHTML = `
+        <div class="turni-summary-day-content">
+          <div class="turni-summary-day-number">${day}</div>
+          <div class="turni-summary-day-rest">${weekDays[date.getDay()]}<br>Riposo</div>
+        </div>
+      `;
+    }
+    grid.appendChild(dayCard);
+  }
+
+  document.getElementById('turniSummaryShifts').textContent = workingDays;
+  document.getElementById('turniSummaryTotalHours').textContent = `${totalHours.toFixed(1)}h`;
+  document.getElementById('turniSummaryBreaks').textContent = `${totalBreaks.toFixed(1)}h`;
+  document.getElementById('turniSummaryWorkedHours').textContent = `${(totalHours - totalBreaks).toFixed(1)}h`;
+  document.getElementById('turniSummaryDaysOff').textContent = daysOff;
+}
+
+function changeTurniSummaryMonth(delta) {
+  turniCurrentDate.setMonth(turniCurrentDate.getMonth() + delta);
+  renderTurniSummary();
+}
+
+// Initialize turni when DOM is ready
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initTurni, 100);
+});
 </script>
 </body>
 </html>
